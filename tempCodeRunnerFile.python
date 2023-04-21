@@ -1,0 +1,86 @@
+import sys
+
+v = None
+e = None
+graph = []
+via = []
+rt = []
+
+
+def main():
+    global v, e, graph, via, rt
+    print("Please enter the number of Vertices: ")
+    v = int(input())
+    print("Please enter the number of Edges: ")
+    e = int(input())
+    graph = [[9999 if i != j else 0 for j in range(v)] for i in range(v)]
+    via = [[100 for j in range(v)] for i in range(v)]
+    rt = [[9999 for j in range(v)] for i in range(v)]
+    for i in range(e):
+        print(f"Please enter data for Edge {i + 1}:")
+        s = int(input("Source: ")) - 1
+        d = int(input("Destination: ")) - 1
+        c = int(input("Cost: "))
+        graph[s][d] = c
+        graph[d][s] = c
+    dvr_calc_disp("The initial Routing Tables are: ")
+    s = int(input("Please enter the Source Node for the edge whose cost has changed: ")) - 1
+    d = int(input("Please enter the Destination Node for the edge whose cost has changed: ")) - 1
+    c = int(input("Please enter the new cost: "))
+    graph[s][d] = c
+    graph[d][s] = c
+    dvr_calc_disp("The new Routing Tables are: ")
+
+
+def dvr_calc_disp(message):
+    global v, rt, via
+    init_tables()
+    update_tables()
+    print()
+    print(message)
+    print_tables()
+    print()
+
+
+def update_table(source):
+    global v, graph, rt, via
+    for i in range(v):
+        if graph[source][i] != 9999:
+            dist = graph[source][i]
+            for j in range(v):
+                inter_dist = rt[i][j]
+                if via[i][j] == source:
+                    inter_dist = 9999
+                if dist + inter_dist < rt[source][j]:
+                    rt[source][j] = dist + inter_dist
+                    via[source][j] = i
+
+
+def update_tables():
+    global v
+    for i in range(4 * v):
+        update_table(i % v)
+
+
+def init_tables():
+    global v, rt, via
+    for i in range(v):
+        for j in range(v):
+            if i == j:
+                rt[i][j] = 0
+                via[i][j] = i
+            else:
+                rt[i][j] = 9999
+                via[i][j] = 100
+
+
+def print_tables():
+    global v, rt
+    for i in range(v):
+        for j in range(v):
+            print(f"Dist: {rt[i][j]}")
+    print()
+
+
+if __name__ == '__main__':
+    main()
